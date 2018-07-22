@@ -1,8 +1,10 @@
 package com.ixidev.simplenotepad;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,14 +14,19 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.ixidev.simplenotepad.adapters.NotesAdapter;
+import com.ixidev.simplenotepad.callbacks.NoteEventListener;
 import com.ixidev.simplenotepad.db.NotesDB;
 import com.ixidev.simplenotepad.db.NotesDao;
 import com.ixidev.simplenotepad.model.Note;
+import com.ixidev.simplenotepad.utils.NoteUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import static com.ixidev.simplenotepad.EditeNoteActivity.NOTE_EXTRA_Key;
+
+public class MainActivity extends AppCompatActivity implements NoteEventListener {
+    private static final String TAG = "MainActivity";
     private RecyclerView recyclerView;
     private ArrayList<Note> notes;
     private NotesAdapter adapter;
@@ -53,11 +60,15 @@ public class MainActivity extends AppCompatActivity {
         List<Note> list = dao.getNotes();// get All notes from DataBase
         this.notes.addAll(list);
         this.adapter = new NotesAdapter(this, this.notes);
+        // set listener to adapter
+        this.adapter.setListener(this);
         this.recyclerView.setAdapter(adapter);
     }
 
+    /**
+     * Start EditNoteActivity.class for Create New Note
+     */
     private void onAddNewNote() {
-        // TODO: 20/06/2018 start EditeNoteActivity
         startActivity(new Intent(this, EditeNoteActivity.class));
 
     }
@@ -89,5 +100,55 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadNotes();
+    }
+
+    @Override
+    public void onNoteClick(Note note) {
+        // TODO: 22/07/2018  note clicked : edit note
+        Intent edit = new Intent(this, EditeNoteActivity.class);
+        edit.putExtra(NOTE_EXTRA_Key, note.getId());
+        startActivity(edit);
+
+    }
+
+    @Override
+    public void onNoteLongClick(final Note note) {
+        // TODO: 22/07/2018 note long clicked : delete , share ..
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.app_name)
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // TODO: 22/07/2018  delete Note from database adn refresh
+                        dao.deleteNote(note); // delete
+                        loadNotes(); // refresh notes
+
+                    }
+                })
+                .setNegativeButton("Share", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // TODO: 22/07/2018   share note text
+                        Intent share = new Intent(Intent.ACTION_SEND);
+                        // Make your logic to share note
+                        String text = note.getNoteText() + "\n Create on :" +
+                                NoteUtils.dateFromLong(note.getNoteDate())
+                                + " By :" + getString(R.string.app_name);
+                        share.setType("text/plain");
+                        share.putExtra(Intent.EXTRA_TEXT, text);
+                        startActivity(share);
+
+                    }
+                })
+                .create()
+                .show();
+
     }
 }

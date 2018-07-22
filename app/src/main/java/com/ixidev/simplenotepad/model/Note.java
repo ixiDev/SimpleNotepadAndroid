@@ -11,11 +11,14 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "notes")
 public class Note {
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private int id = -1; // default value
     @ColumnInfo(name = "text")
     private String noteText;
     @ColumnInfo(name = "date")
     private long noteDate;
+
+    public Note() {
+    }
 
     public Note(String noteText, long noteDate) {
         this.noteText = noteText;
@@ -44,5 +47,13 @@ public class Note {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "Note{" +
+                "id=" + id +
+                ", noteDate=" + noteDate +
+                '}';
     }
 }
