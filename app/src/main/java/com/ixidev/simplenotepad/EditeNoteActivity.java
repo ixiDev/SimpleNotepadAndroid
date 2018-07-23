@@ -28,7 +28,7 @@ public class EditeNoteActivity extends AppCompatActivity {
             int id = getIntent().getExtras().getInt(NOTE_EXTRA_Key, 0);
             temp = dao.getNoteById(id);
             inputNote.setText(temp.getNoteText());
-        } else temp = new Note();
+        }
 
     }
 
@@ -51,15 +51,15 @@ public class EditeNoteActivity extends AppCompatActivity {
         String text = inputNote.getText().toString();
         if (!text.isEmpty()) {
             long date = new Date().getTime(); // get  system time
-
-            // if note exist update els crete new
-
-            temp.setNoteDate(date);
-            temp.setNoteText(text);
-
-            if (temp.getId() == -1)
-                dao.insertNote(temp); // insert and save note to database
-            else dao.updateNote(temp);
+            // if  exist update els crete new
+            if (temp == null) {
+                temp = new Note(text, date);
+                dao.insertNote(temp); // create new note and inserted to database
+            } else {
+                temp.setNoteText(text);
+                temp.setNoteDate(date);
+                dao.updateNote(temp); // change text and date and update note on database
+            }
 
             finish(); // return to the MainActivity
         }

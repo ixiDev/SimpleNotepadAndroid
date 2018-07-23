@@ -1,19 +1,20 @@
 package com.ixidev.simplenotepad;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.ixidev.simplenotepad.adapters.NotesAdapter;
+import com.ixidev.simplenotepad.callbacks.MainActionModeCallback;
 import com.ixidev.simplenotepad.callbacks.NoteEventListener;
 import com.ixidev.simplenotepad.db.NotesDB;
 import com.ixidev.simplenotepad.db.NotesDao;
@@ -31,6 +32,9 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     private ArrayList<Note> notes;
     private NotesAdapter adapter;
     private NotesDao dao;
+    private MainActionModeCallback actionModeCallback;
+    private int chackedCount = 0;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // init fab Button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -112,43 +116,95 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     }
 
     @Override
-    public void onNoteLongClick(final Note note) {
+    public void onNoteLongClick(Note note) {
         // TODO: 22/07/2018 note long clicked : delete , share ..
+        note.setChecked(true);
+        chackedCount = 1;
+        adapter.setMultiCheckMode(true);
 
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.app_name)
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // TODO: 22/07/2018  delete Note from database adn refresh
-                        dao.deleteNote(note); // delete
-                        loadNotes(); // refresh notes
+        // set new listener to adapter intend off MainActivity listener that we have implement
+        adapter.setListener(new NoteEventListener() {
+            @Override
+            public void onNoteClick(Note note) {
+                note.setChecked(!note.isChecked()); // inverse selected
+                if (note.isChecked())
+                    chackedCount++;
+                else chackedCount--;
 
-                    }
-                })
-                .setNegativeButton("Share", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // TODO: 22/07/2018   share note text
-                        Intent share = new Intent(Intent.ACTION_SEND);
-                        // Make your logic to share note
-                        String text = note.getNoteText() + "\n Create on :" +
-                                NoteUtils.dateFromLong(note.getNoteDate())
-                                + " By :" + getString(R.string.app_name);
-                        share.setType("text/plain");
-                        share.putExtra(Intent.EXTRA_TEXT, text);
-                        startActivity(share);
+                if (chackedCount > 1) {
+                    actionModeCallback.changeShareItemVisible(false);
+                } else actionModeCallback.changeShareItemVisible(true);
 
-                    }
-                })
-                .create()
-                .show();
+                if (chackedCount == 0) {
+                    //  finish multi select mode wen checked count =0
+                    actionModeCallback.getAction().finish();
+                }
 
+                actionModeCallback.setCount(chackedCount + "/" + notes.size());
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNoteLongClick(Note note) {
+
+            }
+        });
+
+        actionModeCallback = new MainActionModeCallback() {
+            @Override
+            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.action_delete_notes)
+                    onDeleteMultiNotes();
+                else if (menuItem.getItemId() == R.id.action_share_note)
+                    onShareNote();
+
+                actionMode.finish();
+                return false;
+            }
+        };
+
+        // start action mode
+        startActionMode(actionModeCallback);
+        // hide fab button
+        fab.setVisibility(View.GONE);
+        actionModeCallback.setCount(chackedCount + "/" + notes.size());
+    }
+
+    private void onShareNote() {
+        // TODO: 22/07/2018  we need share just one Note not multi
+
+        Note note = adapter.getCheckedNotes().get(0);
+        // TODO: 22/07/2018 do your logic here to share note ; on social or something else
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("text/plain");
+        String notetext = note.getNoteText() + "\n\n Create on : " +
+                NoteUtils.dateFromLong(note.getNoteDate()) + "\n  By :" +
+                getString(R.string.app_name);
+        share.putExtra(Intent.EXTRA_TEXT, notetext);
+        startActivity(share);
+
+    }
+
+    private void onDeleteMultiNotes() {
+        // TODO: 22/07/2018 delete multi notes
+
+        List<Note> chackedNotes = adapter.getCheckedNotes();
+        if (chackedNotes.size() != 0) {
+            for (Note note : chackedNotes) {
+                dao.deleteNote(note);
+            }
+            // refresh Notes
+            loadNotes();
+            Toast.makeText(this, chackedNotes.size() + " Note(s) Delete successfully !", Toast.LENGTH_SHORT).show();
+        } else Toast.makeText(this, "No Note(s) selected", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onActionModeFinished(ActionMode mode) {
+        super.onActionModeFinished(mode);
+
+        adapter.setMultiCheckMode(false);
+        adapter.setListener(this); // set back the old listener
+        fab.setVisibility(View.VISIBLE);
     }
 }

@@ -2,6 +2,7 @@ package com.ixidev.simplenotepad.model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 /**
@@ -11,11 +12,14 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "notes")
 public class Note {
     @PrimaryKey(autoGenerate = true)
-    private int id = -1; // default value
+    private int id; // default value
     @ColumnInfo(name = "text")
     private String noteText;
     @ColumnInfo(name = "date")
     private long noteDate;
+
+    @Ignore // we don't want to store this value on database so ignore it
+    private boolean checked = false;
 
     public Note() {
     }
@@ -47,6 +51,14 @@ public class Note {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 
     @Override

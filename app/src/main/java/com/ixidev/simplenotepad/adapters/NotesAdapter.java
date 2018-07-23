@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.ixidev.simplenotepad.R;
@@ -13,6 +14,7 @@ import com.ixidev.simplenotepad.model.Note;
 import com.ixidev.simplenotepad.utils.NoteUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ixi.Dv on 13/05/2018.
@@ -21,6 +23,8 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
     private Context context;
     private ArrayList<Note> notes;
     private NoteEventListener listener;
+    private boolean multiCheckMode = false;
+
 
     public NotesAdapter(Context context, ArrayList<Note> notes) {
         this.context = context;
@@ -57,6 +61,13 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
                 }
             });
 
+            // check checkBox if note selected
+            if (multiCheckMode) {
+                holder.checkBox.setVisibility(View.VISIBLE); // show checkBox if multiMode on
+                holder.checkBox.setChecked(note.isChecked());
+            } else holder.checkBox.setVisibility(View.GONE); // hide checkBox if multiMode off
+
+
         }
     }
 
@@ -69,18 +80,42 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
         return notes.get(position);
     }
 
+
+    /**
+     * get All checked notes
+     *
+     * @return Array
+     */
+    public List<Note> getCheckedNotes() {
+        List<Note> checkedNotes = new ArrayList<>();
+        for (Note n : this.notes) {
+            if (n.isChecked())
+                checkedNotes.add(n);
+        }
+
+        return checkedNotes;
+    }
+
+
     class NoteHolder extends RecyclerView.ViewHolder {
         TextView noteText, noteDate;
+        CheckBox checkBox;
 
         public NoteHolder(View itemView) {
             super(itemView);
             noteDate = itemView.findViewById(R.id.note_date);
             noteText = itemView.findViewById(R.id.note_text);
+            checkBox = itemView.findViewById(R.id.checkBox);
         }
     }
 
 
     public void setListener(NoteEventListener listener) {
         this.listener = listener;
+    }
+
+    public void setMultiCheckMode(boolean multiCheckMode) {
+        this.multiCheckMode = multiCheckMode;
+        notifyDataSetChanged();
     }
 }

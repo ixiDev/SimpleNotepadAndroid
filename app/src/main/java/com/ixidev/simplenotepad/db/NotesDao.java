@@ -31,7 +31,7 @@ public interface NotesDao {
      * @param note that will be delete
      */
     @Delete
-    void deleteNote(Note note);
+    void deleteNote(Note... note);
 
     /**
      * Update note
