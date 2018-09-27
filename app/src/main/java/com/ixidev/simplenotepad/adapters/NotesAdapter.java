@@ -1,6 +1,7 @@
 package com.ixidev.simplenotepad.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,8 +33,9 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
     }
 
 
+    @NonNull
     @Override
-    public NoteHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public NoteHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.note_layout, parent, false);
         return new NoteHolder(v);
     }
@@ -116,6 +118,10 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
 
     public void setMultiCheckMode(boolean multiCheckMode) {
         this.multiCheckMode = multiCheckMode;
+        if (!multiCheckMode)
+            for (Note note : this.notes) {
+                note.setChecked(false);
+            }
         notifyDataSetChanged();
     }
 }

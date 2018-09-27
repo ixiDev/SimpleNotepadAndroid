@@ -28,7 +28,7 @@ public class EditeNoteActivity extends AppCompatActivity {
             int id = getIntent().getExtras().getInt(NOTE_EXTRA_Key, 0);
             temp = dao.getNoteById(id);
             inputNote.setText(temp.getNoteText());
-        }
+        } else inputNote.setFocusable(true);
 
     }
 

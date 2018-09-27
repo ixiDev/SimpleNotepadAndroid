@@ -6,20 +6,22 @@
     android:layout_height="match_parent"
     tools:context="com.ixidev.simplenotepad.EditeNoteActivity">
 
-    <android.support.design.widget.TextInputLayout
+
+    <EditText
+        android:id="@+id/input_note"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_gravity="top"
+        android:background="#fff"
+        android:ems="10"
+        android:hint="@string/whats_in_your_mind"
+        android:gravity="top"
+        android:inputType="textMultiLine"
+        android:paddingEnd="12dp"
+        android:paddingStart="12dp"
+        android:paddingTop="4dp"
+        tools:text="@tools:sample/lorem/random"
 
-        <EditText
-            android:id="@+id/input_note"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="top"
-            android:background="#fff"
-            android:ems="10"
-            android:gravity="top"
-            android:inputType="textMultiLine"
+        />
 
-            />
-    </android.support.design.widget.TextInputLayout>
 </RelativeLayout>

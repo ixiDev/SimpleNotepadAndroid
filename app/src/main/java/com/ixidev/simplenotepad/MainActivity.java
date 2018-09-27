@@ -67,6 +67,14 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         // set listener to adapter
         this.adapter.setListener(this);
         this.recyclerView.setAdapter(adapter);
+        if (notes.size() == 0) {
+            this.recyclerView.setVisibility(View.GONE);
+            findViewById(R.id.empty_notes_view).setVisibility(View.VISIBLE);
+
+        } else {
+            this.recyclerView.setVisibility(View.VISIBLE);
+            findViewById(R.id.empty_notes_view).setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -161,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
                 actionMode.finish();
                 return false;
             }
+
         };
 
         // start action mode
@@ -183,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         share.putExtra(Intent.EXTRA_TEXT, notetext);
         startActivity(share);
 
+
     }
 
     private void onDeleteMultiNotes() {
@@ -197,13 +207,15 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
             loadNotes();
             Toast.makeText(this, chackedNotes.size() + " Note(s) Delete successfully !", Toast.LENGTH_SHORT).show();
         } else Toast.makeText(this, "No Note(s) selected", Toast.LENGTH_SHORT).show();
+
+        //adapter.setMultiCheckMode(false);
     }
 
     @Override
     public void onActionModeFinished(ActionMode mode) {
         super.onActionModeFinished(mode);
 
-        adapter.setMultiCheckMode(false);
+        adapter.setMultiCheckMode(false); // uncheck the notes
         adapter.setListener(this); // set back the old listener
         fab.setVisibility(View.VISIBLE);
     }
