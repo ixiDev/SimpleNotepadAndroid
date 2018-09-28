@@ -1,12 +1,15 @@
 package com.ixidev.simplenotepad;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -67,6 +70,16 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         // set listener to adapter
         this.adapter.setListener(this);
         this.recyclerView.setAdapter(adapter);
+        showEmptyView();
+        // add swipe helper to recyclerView
+
+        swipeToDeleteHelper.attachToRecyclerView(recyclerView);
+    }
+
+    /**
+     * when no notes show msg in main_layout
+     */
+    private void showEmptyView() {
         if (notes.size() == 0) {
             this.recyclerView.setVisibility(View.GONE);
             findViewById(R.id.empty_notes_view).setVisibility(View.VISIBLE);
@@ -219,4 +232,60 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         adapter.setListener(this); // set back the old listener
         fab.setVisibility(View.VISIBLE);
     }
+
+    // swipe to right or to left te delete
+    private ItemTouchHelper swipeToDeleteHelper = new ItemTouchHelper(
+            new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                @Override
+                public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                    return false;
+                }
+
+                @Override
+                public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                    // TODO: 28/09/2018 delete note when swipe
+
+                    if (notes != null) {
+                        // get swiped note
+                        Note swipedNote = notes.get(viewHolder.getAdapterPosition());
+                        if (swipedNote != null) {
+                            swipeToDelete(swipedNote, viewHolder);
+
+                        }
+
+                    }
+                }
+            });
+
+    private void swipeToDelete(final Note swipedNote, final RecyclerView.ViewHolder viewHolder) {
+        new AlertDialog.Builder(MainActivity.this)
+                .setMessage("Delete Note?")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // TODO: 28/09/2018 delete note
+                        dao.deleteNote(swipedNote);
+                        notes.remove(swipedNote);
+                        adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                        showEmptyView();
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // TODO: 28/09/2018  Undo swipe and restore swipedNote
+                        recyclerView.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
+
+
+                    }
+                })
+                .setCancelable(false)
+                .create().show();
+
+    }
+
 }
+
+
+
