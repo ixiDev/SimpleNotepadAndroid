@@ -31,4 +31,11 @@ dependencies {
     annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
     implementation 'android.arch.paging:runtime:1.0.0'
     testImplementation 'android.arch.persistence.room:testing:1.1.1'
+
+    // add this line for Material Drawer
+        implementation('com.mikepenz:materialdrawer:6.0.6@aar') {
+            transitive = true
+        }
+
+
 }

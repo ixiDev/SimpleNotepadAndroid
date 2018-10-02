@@ -23,13 +23,21 @@ import com.ixidev.simplenotepad.db.NotesDB;
 import com.ixidev.simplenotepad.db.NotesDao;
 import com.ixidev.simplenotepad.model.Note;
 import com.ixidev.simplenotepad.utils.NoteUtils;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.ixidev.simplenotepad.EditeNoteActivity.NOTE_EXTRA_Key;
 
-public class MainActivity extends AppCompatActivity implements NoteEventListener {
+public class MainActivity extends AppCompatActivity implements NoteEventListener, Drawer.OnDrawerItemClickListener {
     private static final String TAG = "MainActivity";
     private RecyclerView recyclerView;
     private ArrayList<Note> notes;
@@ -45,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        setupNavigation(savedInstanceState, toolbar);
         // init recyclerView
         recyclerView = findViewById(R.id.notes_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -60,6 +70,43 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         });
 
         dao = NotesDB.getInstance(this).notesDao();
+    }
+
+    private void setupNavigation(Bundle savedInstanceState, Toolbar toolbar) {
+
+        // Navigation menu items
+        List<IDrawerItem> iDrawerItems = new ArrayList<>();
+        iDrawerItems.add(new PrimaryDrawerItem().withName("Home").withIcon(R.drawable.ic_home_black_24dp));
+        iDrawerItems.add(new PrimaryDrawerItem().withName("Notes").withIcon(R.drawable.ic_note_black_24dp));
+
+        // sticky DrawItems ; footer menu items
+
+        List<IDrawerItem> stockyItems = new ArrayList<>();
+        stockyItems.add(new PrimaryDrawerItem().withName("Settings").withIcon(R.drawable.ic_settings_black_24dp));
+        stockyItems.add(new SwitchDrawerItem().withName("Dark Theme").withIcon(R.drawable.ic_dark_theme));
+        // navigation menu header
+        AccountHeader header = new AccountHeaderBuilder().withActivity(this)
+                .addProfiles(new ProfileDrawerItem()
+                        .withEmail("feedback.mrzero@gmail.com")
+                        .withName("ixiDev")
+                        .withIcon(R.mipmap.ic_launcher_round))
+                .withSavedInstance(savedInstanceState)
+                .withHeaderBackground(R.drawable.ic_launcher_background)
+                .withSelectionListEnabledForSingleProfile(false) // we need just one profile
+                .build();
+
+        // Navigation drawer
+        new DrawerBuilder()
+                .withActivity(this) // activity main
+                .withToolbar(toolbar) // toolbar
+                .withSavedInstance(savedInstanceState) // saveInstance of activity
+                .withDrawerItems(iDrawerItems) // menu items
+                .withTranslucentNavigationBar(true)
+                .withStickyDrawerItems(stockyItems) // footer items
+                .withAccountHeader(header) // header of navigation
+                .withOnDrawerItemClickListener(this) // listener for menu items click
+                .build();
+
     }
 
     private void loadNotes() {
@@ -285,6 +332,12 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
     }
 
+    @Override
+    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
+        Toast.makeText(this, "" + position, Toast.LENGTH_SHORT).show();
+        return false;
+    }
 }
 
 
