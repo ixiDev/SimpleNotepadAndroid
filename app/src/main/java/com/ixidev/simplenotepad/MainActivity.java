@@ -1,7 +1,10 @@
 package com.ixidev.simplenotepad;
 
+import android.app.TaskStackBuilder;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -14,6 +17,7 @@ import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.ixidev.simplenotepad.adapters.NotesAdapter;
@@ -27,6 +31,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
@@ -46,9 +51,16 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     private MainActionModeCallback actionModeCallback;
     private int chackedCount = 0;
     private FloatingActionButton fab;
+    private SharedPreferences settings;
+    public static final String THEME_Key = "app_theme";
+    public static final String APP_PREFERENCES="notepad_settings";
+    private int theme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        settings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        theme = settings.getInt(THEME_Key, R.style.AppTheme);
+        setTheme(theme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -82,8 +94,34 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         // sticky DrawItems ; footer menu items
 
         List<IDrawerItem> stockyItems = new ArrayList<>();
+
+        SwitchDrawerItem switchDrawerItem = new SwitchDrawerItem()
+                .withName("Dark Theme")
+                .withChecked(theme == R.style.AppTheme_Dark)
+                .withIcon(R.drawable.ic_dark_theme)
+                .withOnCheckedChangeListener(new OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
+                        // TODO: 02/10/2018 change to darck theme and save it to settings
+                        if (isChecked) {
+                            settings.edit().putInt(THEME_Key, R.style.AppTheme_Dark).apply();
+                        } else {
+                            settings.edit().putInt(THEME_Key, R.style.AppTheme).apply();
+                        }
+
+                        // recreate app or the activity // if it's not working follow this steps
+                        // MainActivity.this.recreate();
+
+                        // this lines means wi want to close the app and open it again to change theme
+                        TaskStackBuilder.create(MainActivity.this)
+                                .addNextIntent(new Intent(MainActivity.this, MainActivity.class))
+                                .addNextIntent(getIntent()).startActivities();
+                    }
+                });
+
         stockyItems.add(new PrimaryDrawerItem().withName("Settings").withIcon(R.drawable.ic_settings_black_24dp));
-        stockyItems.add(new SwitchDrawerItem().withName("Dark Theme").withIcon(R.drawable.ic_dark_theme));
+        stockyItems.add(switchDrawerItem);
+
         // navigation menu header
         AccountHeader header = new AccountHeaderBuilder().withActivity(this)
                 .addProfiles(new ProfileDrawerItem()

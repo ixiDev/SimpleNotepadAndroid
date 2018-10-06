@@ -1,7 +1,10 @@
 package com.ixidev.simplenotepad;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -20,8 +23,16 @@ public class EditeNoteActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // set theme
+        SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
+        int theme = sharedPreferences.getInt(MainActivity.THEME_Key, R.style.AppTheme);
+        setTheme(theme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edite_note);
+        Toolbar toolbar = findViewById(R.id.edit_note_activity_toolbar);
+        setSupportActionBar(toolbar);
+
         inputNote = findViewById(R.id.input_note);
         dao = NotesDB.getInstance(this).notesDao();
         if (getIntent().getExtras() != null) {
