@@ -40,7 +40,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.ixidev.simplenotepad.EditeNoteActivity.NOTE_EXTRA_Key;
+import static com.ixidev.simplenotepad.EditNoteActivity.NOTE_EXTRA_Key;
 
 public class MainActivity extends AppCompatActivity implements NoteEventListener, Drawer.OnDrawerItemClickListener {
     private static final String TAG = "MainActivity";
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
      * Start EditNoteActivity.class for Create New Note
      */
     private void onAddNewNote() {
-        startActivity(new Intent(this, EditeNoteActivity.class));
+        startActivity(new Intent(this, EditNoteActivity.class));
 
     }
 
@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     @Override
     public void onNoteClick(Note note) {
         // TODO: 22/07/2018  note clicked : edit note
-        Intent edit = new Intent(this, EditeNoteActivity.class);
+        Intent edit = new Intent(this, EditNoteActivity.class);
         edit.putExtra(NOTE_EXTRA_Key, note.getId());
         startActivity(edit);
 

@@ -15,7 +15,7 @@ import com.ixidev.simplenotepad.model.Note;
 
 import java.util.Date;
 
-public class EditeNoteActivity extends AppCompatActivity {
+public class EditNoteActivity extends AppCompatActivity {
     private EditText inputNote;
     private NotesDao dao;
     private Note temp;
