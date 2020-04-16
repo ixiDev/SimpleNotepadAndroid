@@ -6,13 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +13,14 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ixidev.simplenotepad.adapters.NotesAdapter;
 import com.ixidev.simplenotepad.callbacks.MainActionModeCallback;
 import com.ixidev.simplenotepad.callbacks.NoteEventListener;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         setTheme(theme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         setupNavigation(savedInstanceState, toolbar);
@@ -87,13 +88,15 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     private void setupNavigation(Bundle savedInstanceState, Toolbar toolbar) {
 
         // Navigation menu items
-        List<IDrawerItem> iDrawerItems = new ArrayList<>();
+       // List<IDrawerItem> iDrawerItems = new ArrayList<>(); fix error : removed on materialdrawer 7.0.0
+        List<IDrawerItem<?>> iDrawerItems = new ArrayList<>();
         iDrawerItems.add(new PrimaryDrawerItem().withName("Home").withIcon(R.drawable.ic_home_black_24dp));
         iDrawerItems.add(new PrimaryDrawerItem().withName("Notes").withIcon(R.drawable.ic_note_black_24dp));
 
         // sticky DrawItems ; footer menu items
 
-        List<IDrawerItem> stockyItems = new ArrayList<>();
+       // List<IDrawerItem> stockyItems = new ArrayList<>(); removed on materialdrawer 7.0.0
+        List<IDrawerItem<?>> stockyItems = new ArrayList<>();
 
         SwitchDrawerItem switchDrawerItem = new SwitchDrawerItem()
                 .withName("Dark Theme")

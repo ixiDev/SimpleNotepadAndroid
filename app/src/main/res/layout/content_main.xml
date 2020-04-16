@@ -8,7 +8,7 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:visibility="gone"
         android:id="@+id/notes_list"
         android:layout_width="match_parent"
