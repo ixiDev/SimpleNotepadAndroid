@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.ixidev.simplenotepad.EditNoteActivity">
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/edit_note_activity_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme" />
+
+    <EditText
+        android:id="@+id/input_note"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/edit_note_activity_toolbar"
+        android:layout_gravity="top"
+        android:background="@android:color/white"
+        android:ems="10"
+        android:gravity="top"
+        android:hint="@string/whats_in_your_mind"
+        android:inputType="textMultiLine"
+        android:paddingStart="12dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="12dp"
+        android:textColor="@color/colorPrimary_dark"
+        android:textColorHint="@color/colorPrimary"
+        tools:text="@tools:sample/lorem/random"
+
+        />
+</RelativeLayout>
